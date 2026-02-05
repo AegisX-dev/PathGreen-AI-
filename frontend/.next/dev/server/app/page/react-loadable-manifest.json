@@ -1,0 +1,11 @@
+{
+  "[project]/app/components/FleetMap.tsx [app-client] (ecmascript, next/dynamic entry)": {
+    "id": "[project]/app/components/FleetMap.tsx [app-client] (ecmascript, next/dynamic entry)",
+    "files": [
+      "static/chunks/node_modules__pnpm_5c71fe81._.js",
+      "static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js",
+      "static/chunks/app_components_FleetMap_tsx_6a5166a5._.js",
+      "static/chunks/app_components_FleetMap_tsx_0e262563._.js"
+    ]
+  }
+}

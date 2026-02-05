@@ -1,0 +1,33 @@
+services:
+  pathgreen-engine:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
+    restart: always
+
+  next-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: builder            # <--- Uses the stage with Dev Tools
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8080/ws
+      - NODE_ENV=development
+      - HOSTNAME=0.0.0.0
+    volumes:
+      - ./frontend:/app          # Syncs your code
+      - /app/node_modules        # Keeps container dependencies safe
+      - /app/.next               # Keeps build cache safe
+    command: pnpm dev            # Runs the dev server
+    depends_on:
+      - pathgreen-engine
+    restart: always

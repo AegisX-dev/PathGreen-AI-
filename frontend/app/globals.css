@@ -1,0 +1,404 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   PATHGREEN-AI: BRUTALIST DESIGN SYSTEM
+   High-contrast, character-rich typography, no safe defaults
+   ============================================================================ */
+
+/* --------------------------------------------------------------------------
+   CSS CUSTOM PROPERTIES (Design Tokens)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Background hierarchy - Deep blacks with subtle elevation */
+  --bg-void: #050505;
+  --bg-primary: #0a0a0a;
+  --bg-elevated: #141414;
+  --bg-surface: #1a1a1a;
+  --bg-hover: #222222;
+
+  /* Text hierarchy */
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+
+  /* Accent colors - Carbon/Emission themed */
+  --accent-green: #00ff66; /* Safe - Low emissions */
+  --accent-green-dim: #00cc52;
+  --accent-amber: #ffb800; /* Warning */
+  --accent-amber-dim: #cc9300;
+  --accent-red: #ff3333; /* Critical - High emissions */
+  --accent-red-dim: #cc2929;
+  --accent-blue: #00aaff; /* Info/Interactive */
+
+  /* Brutalist borders */
+  --border-color: #333333;
+  --border-brutal: 2px solid var(--border-color);
+  --border-harsh: 3px solid var(--text-primary);
+
+  /* Shadows - Harsh, no blur */
+  --shadow-brutal: 4px 4px 0 #000;
+  --shadow-glow-green: 0 0 20px rgba(0, 255, 102, 0.3);
+  --shadow-glow-red: 0 0 20px rgba(255, 51, 51, 0.3);
+
+  /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Typography */
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+
+  /* Animation */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+}
+
+/* --------------------------------------------------------------------------
+   GLOBAL RESETS & BASE STYLES
+   -------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   TYPOGRAPHY
+   -------------------------------------------------------------------------- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+h2 {
+  font-size: 1.75rem;
+}
+h3 {
+  font-size: 1.25rem;
+}
+h4 {
+  font-size: 1rem;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+}
+
+/* --------------------------------------------------------------------------
+   BRUTALIST COMPONENTS
+   -------------------------------------------------------------------------- */
+
+/* Cards with harsh borders */
+.card {
+  background: var(--bg-elevated);
+  border: var(--border-brutal);
+  padding: var(--space-md);
+}
+
+.card-surface {
+  background: var(--bg-surface);
+  border: var(--border-brutal);
+  padding: var(--space-md);
+}
+
+/* Status indicators */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot--green {
+  background: var(--accent-green);
+  box-shadow: var(--shadow-glow-green);
+}
+
+.status-dot--amber {
+  background: var(--accent-amber);
+  animation: pulse-amber 2s ease-in-out infinite;
+}
+
+.status-dot--red {
+  background: var(--accent-red);
+  box-shadow: var(--shadow-glow-red);
+  animation: pulse-red 1s ease-in-out infinite;
+}
+
+@keyframes pulse-amber {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes pulse-red {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Buttons - Brutalist style */
+.btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  border: var(--border-harsh);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn:hover {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+.btn--primary {
+  background: var(--accent-green);
+  color: var(--bg-primary);
+  border-color: var(--accent-green);
+}
+
+.btn--primary:hover {
+  background: var(--accent-green-dim);
+  border-color: var(--accent-green-dim);
+}
+
+/* Input fields */
+.input {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-surface);
+  border: var(--border-brutal);
+  color: var(--text-primary);
+  width: 100%;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 170, 255, 0.2);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   ALERT SEVERITY BADGES
+   -------------------------------------------------------------------------- */
+.badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge--critical {
+  background: var(--accent-red);
+  color: var(--bg-primary);
+}
+
+.badge--warning {
+  background: var(--accent-amber);
+  color: var(--bg-primary);
+}
+
+.badge--info {
+  background: var(--accent-blue);
+  color: var(--bg-primary);
+}
+
+.badge--success {
+  background: var(--accent-green);
+  color: var(--bg-primary);
+}
+
+/* --------------------------------------------------------------------------
+   DATA DISPLAY
+   -------------------------------------------------------------------------- */
+.metric {
+  font-family: var(--font-mono);
+}
+
+.metric__value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.metric__unit {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-left: 4px;
+}
+
+.metric__label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   LAYOUT UTILITIES
+   -------------------------------------------------------------------------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+  gap: 0;
+}
+
+.sidebar {
+  background: var(--bg-primary);
+  border-left: var(--border-brutal);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  background: var(--bg-primary);
+  border-bottom: var(--border-brutal);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* --------------------------------------------------------------------------
+   SCROLLBAR STYLING
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border: 1px solid var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   LEAFLET MAP OVERRIDES
+   -------------------------------------------------------------------------- */
+.leaflet-container {
+  background: var(--bg-void) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-elevated) !important;
+  border: var(--border-brutal) !important;
+  border-radius: 0 !important;
+  color: var(--text-primary) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.leaflet-control-zoom a {
+  background: var(--bg-surface) !important;
+  border: var(--border-brutal) !important;
+  color: var(--text-primary) !important;
+  border-radius: 0 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--bg-hover) !important;
+}
+
+/* --------------------------------------------------------------------------
+   LIVE INDICATOR
+   -------------------------------------------------------------------------- */
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.live-indicator__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  animation: live-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.7);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 8px rgba(0, 255, 102, 0);
+  }
+}

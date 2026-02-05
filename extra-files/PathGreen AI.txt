@@ -1,0 +1,37 @@
+PathGreen-AI is a real-time logistics intelligence platform built on Pathway to decarbonize Indian supply chains. By moving away from "Groundhog Day" AI that relies on old data , your project ensures that fleet managers react to environmental and operational inefficiencies the second they happen.
+🟢 The Core Vision
+
+The project solves the "Stale Data Problem" in logistics. Instead of analyzing fuel waste at the end of the month, PathGreen-AI uses a live "conveyor belt" of data to reduce emissions during the trip.
+1. Real-Time Data "Pulse" (Ingestion)
+
+    Live GPS & IoT Streams: The system ingests continuous coordinates and engine data (like fuel levels or temperature) via Kafka or MQTT.
+
+    No Delays: Unlike traditional systems that process data in batches (introducing delays), PathGreen-AI processes every millisecond of incoming data.
+
+    Dynamic Context: It joins these live streams with static data like "Greenest Route" maps and Bharat Stage (BS-VI) emission standards.
+
+2. Smart "Green" Transformations (Processing)
+
+Using Pathway’s streaming engine, the system performs "on-the-fly" calculations:
+
+    Carbon Footprint Tracking: It computes real-time emission metrics based on current speed and vehicle load.
+
+    Anomaly Detection: It automatically flags "High-Emission Events," such as a driver taking a longer route or idling in traffic for too long.
+
+    Stateful Windows: It calculates moving averages of fuel efficiency over specific time windows to predict when a vehicle might need "Predictive Maintenance" to stay green.
+
+3. The "Live" Document Store (RAG)
+
+Unlike standard AI, PathGreen-AI keeps its memory inside the pipeline.
+
+    Always Updated: It continuously indexes new environmental regulations, traffic reports, and maintenance logs.
+
+    Instant Retrieval: When things change—like a new "Green Zone" city ordinance—the AI knows immediately without needing to be retrained.
+
+4. Agentic Interaction (The LLM)
+
+Fleet managers can talk to PathGreen-AI using an LLM (like Gemini) to get instant, explainable insights:
+
+    "Which trucks are currently exceeding their carbon quota?" 
+
+    "Suggest a reroute for Vehicle #402 to avoid the high-traffic smog zone."
