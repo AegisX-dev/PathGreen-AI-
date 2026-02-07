@@ -6,8 +6,11 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688)
 ![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash--Lite-4285F4)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E)
 
 PathGreen-AI is a real-time logistics intelligence system for monitoring fleet carbon emissions. It combines live vehicle tracking, emission analytics, and an AI-powered chat interface to help fleet operators reduce their environmental footprint.
+
+**🏆 Built for Hack For Green Bharat** — India's flagship AI sustainability hackathon.
 
 ---
 
@@ -20,26 +23,76 @@ PathGreen-AI is a real-time logistics intelligence system for monitoring fleet c
 | 🚛 **Vehicle Status**      | Live status updates (MOVING, IDLE, WARNING, CRITICAL)      |
 | 💬 **AI Chat (RAG)**       | Ask questions about your fleet using Gemini 2.5 Flash-Lite |
 | ⚡ **WebSocket Streaming** | 500ms update intervals for real-time data                  |
+| 🗄️ **Persistent Database** | Supabase PostgreSQL with RLS security                      |
 | 🎨 **Brutalist UI**        | High-contrast design with character-rich typography        |
 
 ---
 
 ## 🏗️ Architecture
 
+```mermaid
+flowchart TB
+    subgraph Frontend["🖥️ Frontend (Next.js 15)"]
+        UI[Dashboard UI]
+        Map[Fleet Map]
+        Gauges[Emission Gauges]
+        Chat[AI Chat Sidebar]
+    end
+
+    subgraph Backend["⚙️ Backend (FastAPI)"]
+        API[REST API]
+        WS[WebSocket Server]
+        SIM[Fleet Simulator]
+        RAG[RAG Engine]
+    end
+
+    subgraph External["☁️ External Services"]
+        Gemini[🤖 Gemini 2.5 Flash-Lite]
+        Supabase[(🗄️ Supabase PostgreSQL)]
+    end
+
+    UI --> Map
+    UI --> Gauges
+    UI --> Chat
+
+    Map <-->|"ws://8080/ws"| WS
+    Gauges <-->|"Real-time Updates"| WS
+    Chat -->|"POST /chat"| API
+
+    WS --> SIM
+    API --> RAG
+    RAG --> Gemini
+
+    SIM -->|"Log Emissions"| Supabase
+    API -->|"Store Alerts"| Supabase
+    RAG -->|"Save Chat History"| Supabase
 ```
-┌─────────────────┐     WebSocket (ws://8080/ws)    ┌─────────────────┐
-│                 │ ◄──────────────────────────────►│                 │
-│  Next.js        │                                 │  FastAPI        │
-│  Frontend       │     HTTP POST (/chat)           │  Backend        │
-│  (Port 3000)    │ ───────────────────────────────►│  (Port 8080)    │
-│                 │                                 │                 │
-└─────────────────┘                                 └────────┬────────┘
-                                                             │
-                                                             ▼
-                                                    ┌─────────────────┐
-                                                    │  Gemini 2.5     │
-                                                    │  Flash-Lite     │
-                                                    └─────────────────┘
+
+### Data Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant Gemini
+    participant Supabase
+
+    Note over Frontend,Backend: Real-time Fleet Updates
+    loop Every 500ms
+        Backend->>Frontend: WebSocket: FLEET_UPDATE
+        Backend->>Supabase: Log emissions (every 5s)
+    end
+
+    Note over User,Gemini: AI Chat Query
+    User->>Frontend: "Why is TRK-104 critical?"
+    Frontend->>Backend: POST /chat
+    Backend->>Backend: Capture live fleet data
+    Backend->>Gemini: Query + Fleet Context
+    Gemini->>Backend: AI Response
+    Backend->>Supabase: Save chat history
+    Backend->>Frontend: Return response
+    Frontend->>User: Display answer
 ```
 
 ---
@@ -61,6 +114,12 @@ PathGreen-AI is a real-time logistics intelligence system for monitoring fleet c
 - **AI**: Google Gemini 2.5 Flash-Lite
 - **Protocol**: WebSocket + REST
 
+### Database
+
+- **Platform**: Supabase (PostgreSQL)
+- **Security**: Row Level Security (RLS) enabled
+- **Tables**: vehicles, emission_logs, alerts, chat_history
+
 ### Infrastructure
 
 - **Containerization**: Docker + Docker Compose
@@ -74,6 +133,7 @@ PathGreen-AI is a real-time logistics intelligence system for monitoring fleet c
 
 - Docker & Docker Compose
 - Gemini API Key ([Get one here](https://aistudio.google.com/apikey))
+- Supabase Project ([Create here](https://supabase.com))
 
 ### 1. Clone the Repository
 
@@ -86,7 +146,11 @@ cd pathgreen-ai
 
 ```bash
 # Create .env file in project root
-echo "GEMINI_API_KEY=your_api_key_here" > .env
+cat > .env << EOF
+GEMINI_API_KEY=your_gemini_key
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your_service_role_key
+EOF
 ```
 
 ### 3. Start the Platform
@@ -108,7 +172,7 @@ docker compose up --build
 ```
 pathgreen-ai/
 ├── backend/
-│   ├── main.py              # FastAPI app with WebSocket & chat
+│   ├── main.py              # FastAPI app with WebSocket, chat & Supabase
 │   ├── requirements.txt     # Python dependencies
 │   └── Dockerfile           # Backend container
 ├── frontend/
@@ -124,6 +188,7 @@ pathgreen-ai/
 │   ├── package.json
 │   └── Dockerfile           # Frontend container
 ├── docker-compose.yml       # Dev mode with hot reload
+├── .env                     # Environment variables (git-ignored)
 └── README.md
 ```
 
@@ -219,12 +284,67 @@ curl -X POST http://localhost:8080/chat \
   -d '{"message": "Why is TRK-104 flagged?"}'
 ```
 
+### GET: `/analytics/emissions`
+
+Get historical emission data from database.
+
+### GET: `/analytics/alerts`
+
+Get alert history from database.
+
 ### GET: `/health`
 
-Health check endpoint:
+Health check with service status:
 
 ```json
-{ "status": "ok" }
+{ "status": "ok", "database": "connected", "ai": "connected" }
+```
+
+---
+
+## 🗄️ Database Schema
+
+```mermaid
+erDiagram
+    vehicles {
+        uuid id PK
+        text vehicle_id UK
+        text name
+        int capacity_kg
+        timestamptz created_at
+    }
+
+    emission_logs {
+        uuid id PK
+        text vehicle_id FK
+        float latitude
+        float longitude
+        int co2_grams
+        text status
+        timestamptz recorded_at
+    }
+
+    alerts {
+        uuid id PK
+        text vehicle_id FK
+        text alert_type
+        text severity
+        text message
+        float latitude
+        float longitude
+        timestamptz created_at
+    }
+
+    chat_history {
+        uuid id PK
+        text user_query
+        text ai_response
+        jsonb fleet_context
+        timestamptz created_at
+    }
+
+    vehicles ||--o{ emission_logs : "has"
+    vehicles ||--o{ alerts : "triggers"
 ```
 
 ---
@@ -251,9 +371,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [CARTO](https://carto.com/) for the dark map tiles
 - [Google Gemini](https://ai.google.dev/) for the AI backbone
 - [FastAPI](https://fastapi.tiangolo.com/) for the blazing-fast backend
+- [Supabase](https://supabase.com/) for the PostgreSQL database
 
 ---
 
 <p align="center">
-  Built with 💚 for a greener future
+  Built with 💚 for a greener future<br/>
+  <strong>Hack For Green Bharat 2026</strong>
 </p>
