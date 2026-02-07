@@ -1,14 +1,15 @@
 # 🌿 PathGreen-AI
 
-> Real-time Fleet Emissions Intelligence Platform powered by AI
+> Real-time Fleet Emissions Intelligence Platform powered by **Pathway Streaming** + **Gemini 2.5 Flash**
 
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688)
-![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash--Lite-4285F4)
+![Pathway](https://img.shields.io/badge/Pathway-0.29.0-blue)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.128+-009688)
+![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-4285F4)
 ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E)
 
-PathGreen-AI is a real-time logistics intelligence system for monitoring fleet carbon emissions. It combines live vehicle tracking, emission analytics, and an AI-powered chat interface to help fleet operators reduce their environmental footprint.
+PathGreen-AI is a real-time logistics intelligence system for monitoring fleet carbon emissions. It uses **Pathway** for streaming data pipelines and **Gemini 2.5 Flash** for RAG-powered AI chat.
 
 **🏆 Built for Hack For Green Bharat** — India's flagship AI sustainability hackathon.
 
@@ -16,15 +17,16 @@ PathGreen-AI is a real-time logistics intelligence system for monitoring fleet c
 
 ## ✨ Features
 
-| Feature                    | Description                                                |
-| -------------------------- | ---------------------------------------------------------- |
-| 🗺️ **Live Fleet Map**      | Dark-themed Leaflet map with color-coded vehicle markers   |
-| 📊 **Emission Gauges**     | Real-time CO₂ tracking with quota progress bars            |
-| 🚛 **Vehicle Status**      | Live status updates (MOVING, IDLE, WARNING, CRITICAL)      |
-| 💬 **AI Chat (RAG)**       | Ask questions about your fleet using Gemini 2.5 Flash-Lite |
-| ⚡ **WebSocket Streaming** | 500ms update intervals for real-time data                  |
-| 🗄️ **Persistent Database** | Supabase PostgreSQL with RLS security                      |
-| 🎨 **Brutalist UI**        | High-contrast design with character-rich typography        |
+| Feature                    | Description                                              |
+| -------------------------- | -------------------------------------------------------- |
+| 🛤️ **Pathway Streaming**   | Real-time GPS/Telemetry data pipelines                   |
+| 🗺️ **Live Fleet Map**      | Dark-themed Leaflet map with color-coded vehicle markers |
+| 📊 **Emission Gauges**     | Real-time CO₂ tracking with quota progress bars          |
+| 🚛 **Vehicle Status**      | Live status updates (MOVING, IDLE, WARNING, CRITICAL)    |
+| 💬 **AI Chat (RAG)**       | Ask questions about your fleet using Gemini 2.5 Flash    |
+| ⚡ **WebSocket Streaming** | 500ms update intervals for real-time data                |
+| 🗄️ **Persistent Database** | Supabase PostgreSQL with RLS security                    |
+| 🎨 **Brutalist UI**        | High-contrast design with character-rich typography      |
 
 ---
 
@@ -110,8 +112,9 @@ sequenceDiagram
 ### Backend
 
 - **Framework**: FastAPI
+- **Streaming**: Pathway (Real-time data pipelines)
 - **Server**: Uvicorn (ASGI)
-- **AI**: Google Gemini 2.5 Flash-Lite
+- **AI**: Google Gemini 2.5 Flash
 - **Protocol**: WebSocket + REST
 
 ### Database
@@ -173,7 +176,13 @@ docker compose up --build
 ```
 pathgreen-ai/
 ├── backend/
-│   ├── main.py              # FastAPI app with WebSocket, chat & Supabase
+│   ├── main.py              # FastAPI app with Pathway integration
+│   ├── gps_connector.py     # Pathway GPS/Telemetry stream subjects
+│   ├── rag.py               # RAG with Pathway VectorStore + fallback
+│   ├── transforms.py        # Emission calculation transforms
+│   ├── schema.py            # Pathway schema definitions
+│   ├── llm_handler.py       # Gemini LLM handler
+│   ├── data/regulations/    # BS-VI regulation documents
 │   ├── requirements.txt     # Python dependencies
 │   └── Dockerfile           # Backend container
 ├── frontend/
@@ -298,7 +307,17 @@ Get alert history from database.
 Health check with service status:
 
 ```json
-{ "status": "ok", "database": "connected", "ai": "connected" }
+{
+  "status": "ok",
+  "version": "3.0.0",
+  "engine": "pathway",
+  "services": {
+    "database": "connected",
+    "ai": "connected",
+    "pathway": "enabled",
+    "rag": "ready"
+  }
+}
 ```
 
 ---
