@@ -9,6 +9,8 @@ services:
       - ./backend:/app
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
     command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
     restart: always
 
@@ -16,7 +18,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: builder            # <--- Uses the stage with Dev Tools
+      target: builder
     ports:
       - "3000:3000"
     environment:
@@ -24,10 +26,10 @@ services:
       - NODE_ENV=development
       - HOSTNAME=0.0.0.0
     volumes:
-      - ./frontend:/app          # Syncs your code
-      - /app/node_modules        # Keeps container dependencies safe
-      - /app/.next               # Keeps build cache safe
-    command: pnpm dev            # Runs the dev server
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: pnpm dev
     depends_on:
       - pathgreen-engine
     restart: always
