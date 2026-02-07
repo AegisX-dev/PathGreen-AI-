@@ -162,8 +162,9 @@ docker compose up --build
 ### 4. Open the Dashboard
 
 - **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **API Docs (Custom)**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 - **Backend Health**: [http://localhost:8080/health](http://localhost:8080/health)
-- **API Docs**: [http://localhost:8080/docs](http://localhost:8080/docs)
+- **Swagger UI**: [http://localhost:8080/docs](http://localhost:8080/docs)
 
 ---
 
