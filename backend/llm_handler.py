@@ -20,7 +20,7 @@ if GEMINI_AVAILABLE:
     try:
         import google.generativeai as genai
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         print("[LLM] Gemini API configured successfully")
     except Exception as e:
         print(f"[LLM] Gemini initialization failed: {e}")

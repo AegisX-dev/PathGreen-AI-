@@ -25,9 +25,20 @@ export interface TruckData {
   co2: number;
 }
 
+// Define Alert Data Type
+export interface AlertData {
+  vehicle_id: string;
+  type: string;
+  severity: string;
+  message: string;
+  lat: number;
+  lng: number;
+  timestamp: string;
+}
+
 export default function Home() {
   const [fleetData, setFleetData] = useState<TruckData[]>([]);
-  const [alerts, setAlerts] = useState<string[]>([]);
+  const [alerts, setAlerts] = useState<AlertData[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -119,7 +130,7 @@ export default function Home() {
               ⚠️ LATEST ALERT
             </div>
             <div className="mono text-sm" style={{ color: 'var(--text-primary)' }}>
-              {alerts[0]}
+              <strong>{alerts[0].vehicle_id}</strong>: {alerts[0].message}
             </div>
           </div>
         )}

@@ -29,8 +29,10 @@ FROM python:3.11-slim AS runtime
 
 WORKDIR /app
 
-# Install curl for healthcheck
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
+# Install curl for healthcheck and poppler-utils for pdf2image
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy virtual environment from builder
@@ -38,8 +40,11 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy application code only
-COPY main.py schema.py transforms.py rag.py llm_handler.py ./
+COPY main.py schema.py transforms.py rag.py llm_handler.py gps_connector.py ./
 COPY data/ ./data/
+
+# Create output directory for Pathway streams
+RUN mkdir -p ./output
 
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash appuser \
