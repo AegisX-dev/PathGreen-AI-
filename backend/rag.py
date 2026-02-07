@@ -43,7 +43,7 @@ DATA_DIR = Path(__file__).parent / "data" / "regulations"
 
 # LLM Configuration
 LLM_MODEL = "gemini/gemini-2.5-flash"
-EMBEDDER_MODEL = "models/embedding-001"
+EMBEDDER_MODEL = "models/gemini-embedding-001"
 RETRY_STRATEGY = None  # Will be initialized if Pathway available
 
 # RAG Configuration
@@ -167,7 +167,7 @@ class PathwayRAGHandler:
                 llm=self.chat,
                 indexer=self.vector_store,
                 search_topk=SEARCH_TOP_K,
-                short_prompt_template=prompts.prompt_qa,
+                prompt_template=prompts.prompt_qa,
             )
             
             self._initialized = True
@@ -201,6 +201,35 @@ class PathwayRAGHandler:
         logger.info("[RAG] Starting RAG server...")
         self._server_running = True
         self.rag_app.run_server()
+    
+    def get_context(self, query: str, max_chunks: int = 3) -> str:
+        """
+        Get context for a query using fallback handler.
+        
+        For now, we delegate to FallbackRAGHandler for reliable context retrieval.
+        Pathway VectorStore can be used for advanced semantic queries later.
+        
+        Args:
+            query: User question
+            max_chunks: Maximum chunks to return
+        
+        Returns:
+            Formatted context string
+        """
+        # Use fallback handler for context (reliable keyword search)
+        if not hasattr(self, '_fallback'):
+            self._fallback = FallbackRAGHandler()
+            self._fallback.initialize()
+        
+        return self._fallback.get_context(query, max_chunks)
+    
+    def get_citations(self, query: str) -> list[str]:
+        """Get citation sources for a query."""
+        if not hasattr(self, '_fallback'):
+            self._fallback = FallbackRAGHandler()
+            self._fallback.initialize()
+        
+        return self._fallback.get_citations(query)
     
     def query(self, question: str) -> dict:
         """
