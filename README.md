@@ -21,12 +21,15 @@ PathGreen-AI is a real-time logistics intelligence system for monitoring fleet c
 | -------------------------- | -------------------------------------------------------- |
 | 🛤️ **Pathway Streaming**   | Real-time GPS/Telemetry data pipelines                   |
 | 🗺️ **Live Fleet Map**      | Dark-themed Leaflet map with color-coded vehicle markers |
-| 📊 **Emission Gauges**     | Real-time CO₂ tracking with quota progress bars          |
+| 📊 **Emission Gauges**     | Compact CO₂ tracking with status pills                   |
 | 🚛 **Vehicle Status**      | Live status updates (MOVING, IDLE, WARNING, CRITICAL)    |
-| 💬 **AI Chat (RAG)**       | Ask questions about your fleet using Gemini 2.5 Flash    |
+| 💬 **AI Chat (RAG)**       | Semantic search on BS-VI regulations + Gemini 2.5 Flash  |
 | ⚡ **WebSocket Streaming** | 500ms update intervals for real-time data                |
 | 🗄️ **Persistent Database** | Supabase PostgreSQL with RLS security                    |
 | 🎨 **Brutalist UI**        | High-contrast design with character-rich typography      |
+| 📑 **Tabbed Sidebar**      | Fleet / Analytics / Chat tabs for cleaner layout         |
+| ↔️ **Resizable Sidebar**   | Drag to resize sidebar between 320px and 600px           |
+| 🔍 **Semantic Search**     | Gemini embeddings for meaning-based regulation lookup    |
 
 ---
 

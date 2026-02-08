@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { ChatSidebar } from './components/ChatSidebar';
 import { VehicleList } from './components/VehicleList';
@@ -36,11 +36,52 @@ export interface AlertData {
   timestamp: string;
 }
 
+// Tab types
+type TabType = 'fleet' | 'analytics' | 'chat';
+
 export default function Home() {
   const [fleetData, setFleetData] = useState<TruckData[]>([]);
   const [alerts, setAlerts] = useState<AlertData[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>('fleet');
+  
+  // Resizable sidebar state
+  const [sidebarWidth, setSidebarWidth] = useState(384); // Default w-96 = 384px
+  const isResizing = useRef(false);
+  const MIN_WIDTH = 320;
+  const MAX_WIDTH = 600;
+
+  // Handle mouse move for resize
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing.current) return;
+    const newWidth = window.innerWidth - e.clientX;
+    setSidebarWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, newWidth)));
+  }, []);
+
+  // Handle mouse up to stop resize
+  const handleMouseUp = useCallback(() => {
+    isResizing.current = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }, []);
+
+  // Add/remove resize listeners
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
+
+  // Start resize
+  const startResize = () => {
+    isResizing.current = true;
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   // WebSocket Connection
   useEffect(() => {
@@ -89,6 +130,13 @@ export default function Home() {
     };
   }, []);
 
+  // Tab configuration
+  const tabs: { id: TabType; label: string; icon: string }[] = [
+    { id: 'fleet', label: 'Fleet', icon: '🚛' },
+    { id: 'analytics', label: 'Analytics', icon: '📊' },
+    { id: 'chat', label: 'Chat', icon: '💬' },
+  ];
+
   return (
     <main className="flex h-screen w-screen overflow-hidden" style={{ background: 'var(--bg-void)' }}>
       
@@ -136,17 +184,27 @@ export default function Home() {
         )}
       </div>
 
-      {/* RIGHT: Info Sidebar */}
+      {/* RIGHT: Resizable Tabbed Sidebar */}
       <aside 
-        className="w-96 flex flex-col overflow-hidden"
+        className="flex flex-col overflow-hidden relative"
         style={{ 
+          width: `${sidebarWidth}px`,
+          minWidth: `${MIN_WIDTH}px`,
+          maxWidth: `${MAX_WIDTH}px`,
           background: 'var(--bg-primary)', 
           borderLeft: 'var(--border-brutal)',
         }}
       >
+        {/* Resize Handle */}
+        <div
+          onMouseDown={startResize}
+          className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize z-10 hover:bg-green-500/50 transition-colors"
+          style={{ background: 'transparent' }}
+          title="Drag to resize"
+        />
         {/* Header */}
         <div 
-          className="p-4 flex items-center justify-between"
+          className="p-4 flex items-center justify-between shrink-0"
           style={{ borderBottom: 'var(--border-brutal)' }}
         >
           <h1 
@@ -169,38 +227,81 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 1. Emission Gauges */}
+        {/* Tab Bar */}
         <div 
-          className="shrink-0"
-          style={{ 
-            borderBottom: 'var(--border-brutal)',
-            maxHeight: '320px',
-            overflow: 'auto',
-          }}
+          className="flex shrink-0"
+          style={{ borderBottom: 'var(--border-brutal)' }}
         >
-          <EmissionGauges fleetData={fleetData} />
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className="flex-1 py-3 px-2 mono text-xs transition-all"
+              style={{
+                background: activeTab === tab.id ? 'var(--bg-surface)' : 'transparent',
+                color: activeTab === tab.id ? 'var(--accent-green)' : 'var(--text-muted)',
+                borderBottom: activeTab === tab.id ? '2px solid var(--accent-green)' : '2px solid transparent',
+              }}
+            >
+              <span className="mr-1">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* 2. Vehicle List (Scrollable) */}
-        <div className="flex-1 overflow-y-auto min-h-0">
-          <VehicleList 
-            fleetData={fleetData} 
-            selectedVehicle={selectedVehicle}
-            onVehicleSelect={setSelectedVehicle}
-          />
-        </div>
+        {/* Tab Content */}
+        <div className="flex-1 overflow-hidden flex flex-col">
+          
+          {/* Fleet Tab */}
+          {activeTab === 'fleet' && (
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Compact Emission Summary */}
+              <div 
+                className="shrink-0 p-3"
+                style={{ borderBottom: 'var(--border-brutal)' }}
+              >
+                <EmissionGauges fleetData={fleetData} />
+              </div>
+              
+              {/* Vehicle List - Full Space */}
+              <div className="flex-1 overflow-y-auto">
+                <VehicleList 
+                  fleetData={fleetData} 
+                  selectedVehicle={selectedVehicle}
+                  onVehicleSelect={setSelectedVehicle}
+                />
+              </div>
+            </div>
+          )}
 
-        {/* 3. AI Chat (Fixed Bottom) */}
-        <div 
-          className="shrink-0"
-          style={{ 
-            height: '300px',
-            borderTop: 'var(--border-brutal)',
-          }}
-        >
-          <ChatSidebar isConnected={isConnected} />
+          {/* Analytics Tab */}
+          {activeTab === 'analytics' && (
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+              <div className="text-4xl mb-4">📊</div>
+              <h3 
+                className="mono text-lg mb-2"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                Analytics Dashboard
+              </h3>
+              <p 
+                className="mono text-xs text-center"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                CO₂ trends, fleet efficiency metrics, and historical data coming soon!
+              </p>
+            </div>
+          )}
+
+          {/* Chat Tab */}
+          {activeTab === 'chat' && (
+            <div className="flex-1 overflow-hidden">
+              <ChatSidebar isConnected={isConnected} />
+            </div>
+          )}
         </div>
       </aside>
     </main>
   );
 }
+
