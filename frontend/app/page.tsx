@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { ChatSidebar } from './components/ChatSidebar';
 import { VehicleList } from './components/VehicleList';
 import { EmissionGauges } from './components/EmissionGauges';
+import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 
 // Dynamic import for FleetMap (requires window/Leaflet)
 const FleetMap = dynamic(() => import('./components/FleetMap').then(mod => mod.FleetMap), {
@@ -276,20 +277,8 @@ export default function Home() {
 
           {/* Analytics Tab */}
           {activeTab === 'analytics' && (
-            <div className="flex-1 flex flex-col items-center justify-center p-6">
-              <div className="text-4xl mb-4">📊</div>
-              <h3 
-                className="mono text-lg mb-2"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                Analytics Dashboard
-              </h3>
-              <p 
-                className="mono text-xs text-center"
-                style={{ color: 'var(--text-muted)' }}
-              >
-                CO₂ trends, fleet efficiency metrics, and historical data coming soon!
-              </p>
+            <div className="flex-1 overflow-hidden">
+              <AnalyticsDashboard fleetData={fleetData} />
             </div>
           )}
 
