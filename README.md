@@ -17,19 +17,22 @@ PathGreen-AI is a real-time logistics intelligence system for monitoring fleet c
 
 ## ✨ Features
 
-| Feature                    | Description                                              |
-| -------------------------- | -------------------------------------------------------- |
-| 🛤️ **Pathway Streaming**   | Real-time GPS/Telemetry data pipelines                   |
-| 🗺️ **Live Fleet Map**      | Dark-themed Leaflet map with color-coded vehicle markers |
-| 📊 **Emission Gauges**     | Compact CO₂ tracking with status pills                   |
-| 🚛 **Vehicle Status**      | Live status updates (MOVING, IDLE, WARNING, CRITICAL)    |
-| 💬 **AI Chat (RAG)**       | Semantic search on BS-VI regulations + Gemini 2.5 Flash  |
-| ⚡ **WebSocket Streaming** | 500ms update intervals for real-time data                |
-| 🗄️ **Persistent Database** | Supabase PostgreSQL with RLS security                    |
-| 🎨 **Brutalist UI**        | High-contrast design with character-rich typography      |
-| 📑 **Tabbed Sidebar**      | Fleet / Analytics / Chat tabs for cleaner layout         |
-| ↔️ **Resizable Sidebar**   | Drag to resize sidebar between 320px and 600px           |
-| 🔍 **Semantic Search**     | Gemini embeddings for meaning-based regulation lookup    |
+| Feature                       | Description                                              |
+| ----------------------------- | -------------------------------------------------------- |
+| 🛤️ **Pathway Streaming**      | Real-time GPS/Telemetry data pipelines                   |
+| 🗺️ **Live Fleet Map**         | Dark-themed Leaflet map with color-coded vehicle markers |
+| 📊 **Emission Gauges**        | Compact CO₂ tracking with status pills                   |
+| 🚛 **Vehicle Status**         | Live status updates (MOVING, IDLE, WARNING, CRITICAL)    |
+| 💬 **AI Chat (RAG)**          | Semantic search on BS-VI regulations + Gemini 2.5 Flash  |
+| ⚡ **WebSocket Streaming**    | 500ms update intervals for real-time data                |
+| 🗄️ **Persistent Database**    | Supabase PostgreSQL with RLS security                    |
+| 🎨 **Brutalist UI**           | High-contrast design with character-rich typography      |
+| 📑 **Tabbed Sidebar**         | Fleet / Analytics / Chat tabs for cleaner layout         |
+| ↔️ **Resizable Sidebar**      | Drag to resize sidebar between 320px and 600px           |
+| 🔍 **Semantic Search**        | Gemini embeddings for meaning-based regulation lookup    |
+| 📈 **Analytics Dashboard**    | CO₂ trends, efficiency score, top emitters, live charts  |
+| 🔒 **API Key Auth**           | Protected analytics endpoints with X-API-Key header      |
+| 🛡️ **Prompt Injection Guard** | Regex + delimiter-hardened prompts block LLM attacks     |
 
 ---
 
@@ -156,6 +159,8 @@ cat > .env << EOF
 GEMINI_API_KEY=your_gemini_key
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your_service_role_key
+PATHGREEN_API_KEY=$(openssl rand -hex 32)
+PRODUCTION=false
 EOF
 ```
 
@@ -262,6 +267,34 @@ The UI follows a **Brutalist** design philosophy:
 ```
 
 Typography uses **Space Grotesk** for headings and **JetBrains Mono** for data.
+
+---
+
+## 🔒 Security
+
+PathGreen-AI implements defense-in-depth security:
+
+| Layer                | Protection                                                            |
+| -------------------- | --------------------------------------------------------------------- |
+| **Authentication**   | API key (`X-API-Key` header) required on all `/analytics/*` endpoints |
+| **Prompt Hardening** | Regex-based injection detection + delimiter-separated system prompts  |
+| **CORS**             | Restricted to configured origins (no wildcard `*`)                    |
+| **API Docs**         | Swagger/OpenAPI disabled in production (`PRODUCTION=true`)            |
+| **Error Handling**   | Generic error messages — no stack traces or internal details leaked   |
+| **Data Scoping**     | Explicit column selects — no `SELECT *` on database queries           |
+| **Secrets**          | `.env` gitignored, no hardcoded credentials                           |
+
+### Using Protected Endpoints
+
+```bash
+# Set your API key
+export API_KEY="your_pathgreen_api_key"
+
+# Access analytics
+curl -H "X-API-Key: $API_KEY" http://localhost:8080/analytics/emissions
+curl -H "X-API-Key: $API_KEY" http://localhost:8080/analytics/alerts
+curl -H "X-API-Key: $API_KEY" http://localhost:8080/analytics/chat-history
+```
 
 ---
 
